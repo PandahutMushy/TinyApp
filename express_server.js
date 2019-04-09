@@ -27,10 +27,17 @@ function generateRandomString(length) {
 }
 
 // Handle POST requests sent by /urls/new
-// Respond with 'Ok' (we will replace this)
 app.post("/urls", (req, res) => {
-    console.log(req.body);
-    res.send("Ok");
+    //console.log(req);
+    var postURL = req.body.longURL;
+    var ranStr = generateRandomString(6);
+    urlDatabase[ranStr] = postURL;
+    let templateVars = {
+      shortURL: ranStr,
+        longURL: postURL
+    };
+    res.render("urls_show", templateVars);
+    //res.send("Ok = " + urlDatabase[ranStr]);
 });
 
 //Initial/Index page

@@ -15,7 +15,7 @@
 <body style="font-size:20px; padding:50px;">
     <ul>
          <% for (var url in urls)  { %>
-            <li><%= urls[url] %> - <a href='#' </a><%= url %></a></li>
+            <li><%= urls[url] %> - <a href='<%= urls[url] %>' </a><%= url %></a></li>
         <% } %>
     </ul>
 </body>
