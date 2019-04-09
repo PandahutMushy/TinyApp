@@ -26,13 +26,29 @@ function generateRandomString(length) {
     return str;
 }
 
-// Handle POST requests sent by /urls/new
+// Handle POST requests for adding URLs
 app.post("/urls", (req, res) => {
     //console.log(req);
     let postURL = req.body.longURL;
     let ranStr = generateRandomString(6);
     urlDatabase[ranStr] = postURL;
     res.redirect("urls/" + ranStr);
+});
+
+// Handle POST requests for deleting URLs
+app.post("/urls/:shortURL/delete", (req, res) => {
+    if (req.params.shortURL && urlDatabase[req.params.shortURL])
+        delete urlDatabase[req.params.shortURL];
+
+    res.redirect("/urls");
+});
+
+// Handle POST requests for updating URLs
+app.post("/urls/:id", (req, res) => {
+    if (urlDatabase[req.params.id]) {
+        urlDatabase[req.params.id] = req.body.updateURL;
+    }
+    res.redirect("/urls");
 });
 
 //Initial/Index page
@@ -48,16 +64,11 @@ app.get("/urls/new", (req, res) => {
 
 //Get a shortURL by id
 app.get("/urls/:shortURL", (req, res) => {
-    let longURL = urlDatabase[req.params.shortURL];
-    res.redirect(longURL);
-});
-
-//Delete a shortURL by id
-app.post("/urls/:shortURL/delete", (req, res) => {
-    if (req.params.shortURL && urlDatabase[req.params.shortURL])
-        delete urlDatabase[req.params.shortURL];
-
-    res.redirect("/urls");
+    let templateVars = {
+        shortURL: req.params.shortURL,
+        longURL: urlDatabase[req.params.shortURL]
+    };
+    res.render("urls_show", templateVars);
 });
 
 //Handle short URL requests /u/imageid
