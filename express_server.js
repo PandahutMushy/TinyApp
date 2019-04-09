@@ -60,6 +60,19 @@ app.get("/urls/:shortURL", (req, res) => {
     res.render("urls_show", templateVars);
 });
 
+//Handle short URL requests /u/imageid
+app.get("/u/:shortURL", (req, res) => {
+    const longURL = urlDatabase[req.params.shortURL];
+    if (longURL) res.redirect(longURL);
+    else {
+        let templateVars = {
+            shortURL: req.params.shortURL,
+            longURL: undefined
+        };
+        res.render("urls_show", templateVars);
+    }
+});
+
 app.get("/hello", (req, res) => {
     res.send("<html><body>Hello <b>World</b></body></html>\n");
 });
