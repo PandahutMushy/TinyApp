@@ -15,7 +15,9 @@
 <body style="font-size:20px; padding:50px;">
     <ul>
          <% for (var url in urls)  { %>
-            <li><%= urls[url] %> - <a href='<%= urls[url] %>' </a><%= url %></a></li>
+            <form method="POST" action="/urls/<%=url%>/delete">
+            <li><%= urls[url] %> - <a href='<%= urls[url] %>' </a><%= url %></a>
+            <button type="submit">Delete</input></li></form>
         <% } %>
     </ul>
 </body>

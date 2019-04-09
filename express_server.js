@@ -32,12 +32,7 @@ app.post("/urls", (req, res) => {
     var postURL = req.body.longURL;
     var ranStr = generateRandomString(6);
     urlDatabase[ranStr] = postURL;
-    let templateVars = {
-      shortURL: ranStr,
-        longURL: postURL
-    };
-    res.render("urls_show", templateVars);
-    //res.send("Ok = " + urlDatabase[ranStr]);
+    res.redirect("urls/" + ranStr);
 });
 
 //Initial/Index page
@@ -58,6 +53,14 @@ app.get("/urls/:shortURL", (req, res) => {
         longURL: urlDatabase[req.params.shortURL]
     };
     res.render("urls_show", templateVars);
+});
+
+//Delete a shortURL by id
+app.post("/urls/:shortURL/delete", (req, res) => {
+    if (req.params.shortURL && urlDatabase[req.params.shortURL])
+        delete urlDatabase[req.params.shortURL];
+
+    res.redirect("/urls");
 });
 
 //Handle short URL requests /u/imageid
