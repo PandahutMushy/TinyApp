@@ -1,7 +1,7 @@
 const bodyParser = require("body-parser");
-var express = require("express");
-var app = express();
-var PORT = 8080;
+const express = require("express");
+const app = express();
+const PORT = 8080;
 app.use(bodyParser.urlencoded({ extended: true }));
 app.set("view engine", "ejs");
 
@@ -19,8 +19,8 @@ function generateRandomString(length) {
     var str = "";
     var characters =
         "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-    for (var i = 0; i < length; i++) {
-        var randomNum = Math.floor(Math.random() * characters.length);
+    for (let i = 0; i < length; i++) {
+        let randomNum = Math.floor(Math.random() * characters.length);
         str += characters[randomNum];
     }
     return str;
@@ -29,8 +29,8 @@ function generateRandomString(length) {
 // Handle POST requests sent by /urls/new
 app.post("/urls", (req, res) => {
     //console.log(req);
-    var postURL = req.body.longURL;
-    var ranStr = generateRandomString(6);
+    let postURL = req.body.longURL;
+    let ranStr = generateRandomString(6);
     urlDatabase[ranStr] = postURL;
     res.redirect("urls/" + ranStr);
 });
@@ -48,11 +48,8 @@ app.get("/urls/new", (req, res) => {
 
 //Get a shortURL by id
 app.get("/urls/:shortURL", (req, res) => {
-    let templateVars = {
-      shortURL: req.params.shortURL,
-        longURL: urlDatabase[req.params.shortURL]
-    };
-    res.render("urls_show", templateVars);
+    let longURL = urlDatabase[req.params.shortURL];
+    res.redirect(longURL);
 });
 
 //Delete a shortURL by id
