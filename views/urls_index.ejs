@@ -10,16 +10,18 @@
     <title>TinyApp</title>
 </head>
 
-<header> <% include partials/_header %> </header>
+<!-- Add fixed header -->
+<% include partials/_header %>
 
 <body style="font-size:20px; padding:50px;">
-    <ul>
+    <table style="width:65%; margin:0 auto; text-align:left;" class="table table-hover">
+         <thead><tr><th>Redirect Address</th> <th>Shortened URL</th> <th style="text-align:right;">Action</th></tr></thead>
          <% for (var url in urls)  { %>
-            <form method="POST" action="/urls/<%=url%>/delete">
-            <li><%= urls[url] %> - <a href='<%= urls[url] %>' </a><%= url %></a>
-            <button type="submit">Delete</input></li></form>
+            <tr><td><a href='<%= urls[url] %>'><%= urls[url] %></a></td>
+            <td><a href='/urls/<%= url %>'> http://localhost:8080/urls/<%= url %></a></td>
+            <td><form method="POST" action="/urls/<%=url%>/delete"><button style="float:right;" type="submit">Delete</input></form></td></tr>
         <% } %>
-    </ul>
+    </table>
 </body>
 
 </html>
