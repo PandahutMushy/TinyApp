@@ -1,6 +1,8 @@
+const bodyParser = require("body-parser");
 var express = require("express");
 var app = express();
 var PORT = 8080;
+app.use(bodyParser.urlencoded({ extended: true }));
 app.set("view engine", "ejs");
 
 var urlDatabase = {
@@ -12,15 +14,37 @@ app.get("/", (req, res) => {
     res.send("Hello!");
 });
 
+//Generate a new random 6-digit string for short URLs
+function generateRandomString(length) {
+    var str = "";
+    var characters =
+        "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+    for (var i = 0; i < length; i++) {
+        var randomNum = Math.floor(Math.random() * characters.length);
+        str += characters[randomNum];
+    }
+    return str;
+}
+
+// Handle POST requests sent by /urls/new
+// Respond with 'Ok' (we will replace this)
+app.post("/urls", (req, res) => {
+    console.log(req.body);
+    res.send("Ok");
+});
+
+//Initial/Index page
 app.get("/urls", (req, res) => {
     let templateVars = { urls: urlDatabase };
     res.render("urls_index", templateVars);
 });
 
+//Form to add a new TinyURL
 app.get("/urls/new", (req, res) => {
     res.render("urls_new");
 });
 
+//Get a shortURL by id
 app.get("/urls/:shortURL", (req, res) => {
     let templateVars = {
       shortURL: req.params.shortURL,
