@@ -11,6 +11,19 @@ var urlDatabase = {
     "9sm5xK": "http://www.google.com"
 };
 
+const users = {
+    "userRandomID": {
+        id: "userRandomID",
+        email: "user@example.com",
+        password: "purple-monkey-dinosaur"
+    },
+    "user2RandomID": {
+        id: "user2RandomID",
+        email: "user2@example.com",
+        password: "dishwasher-funk"
+    }
+}
+
 app.get("/", (req, res) => {
     res.send("Hello!");
 });
@@ -26,14 +39,43 @@ function generateRandomString(length) {
     }
     return str;
 }
-// Handle POST login requests
+
+// Handle POST registration requests
 app.post("/login", (req, res) => {
     usrName = req.body.username;
     res.cookie("username", usrName);
     let templateVars = {
-      username: usrName,
-      urls: urlDatabase
+        username: usrName,
+        urls: urlDatabase
     };
+    res.redirect("/urls");
+});
+
+// Handle POST login requests
+app.post("/register", (req, res) => {
+    var usrIDStr = generateRandomString(8);
+    email = req.body.email;
+    password = req.body.password;
+
+    if (!email || !password) {
+        res.status(400).send("You must specify an email and password!");
+        return;
+    }
+    if (checkUsrExists(usrIDStr)) {
+        res.status(400).send("This user ID already exists in the database!");
+      return;
+    }
+
+    let insertObj = {
+        usrIDStr: {
+        id: usrIDStr,
+        email: email,
+        password: password
+      }
+    };
+    users.usrID = insertObj;
+    res.cookie("username", usrIDStr);
+    usrName = usrIDStr;
     res.redirect("/urls");
 });
 
@@ -61,11 +103,17 @@ app.post("/urls/:shortURL/delete", (req, res) => {
 });
 
 // Handle POST requests for updating URLs
-app.post("/urls/:id", (req, res) => {undefined
+app.post("/urls/:id", (req, res) => {
+    undefined
     if (urlDatabase[req.params.id]) {
         urlDatabase[req.params.id] = req.body.updateURL;
     }
     res.redirect("/urls");
+});
+
+// Handle GET requests for user registration
+app.get("/register", (req, res) => {
+    res.render("urls_register");
 });
 
 //Initial/Index page
@@ -116,3 +164,10 @@ app.get("/hello", (req, res) => {
 app.listen(PORT, () => {
     console.log(`Example app listening on port ${PORT}!`);
 });
+
+function checkUsrExists (usr) {
+    if (usr in users) {
+      return true;
+    }
+    return false;
+}

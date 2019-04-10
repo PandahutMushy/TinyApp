@@ -1,5 +1,5 @@
 <!-- views/partials/_header.ejs -->
-<meta charset="UTF-8">
+<!DOCTYPE html>
 <%
 var showForm = "table";
 showLogin = (username === undefined) ? "table" : "none";
@@ -14,8 +14,10 @@ showLogout = (username !== undefined) ? "table" : "none";
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css"
         integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
   <h1><%=(username) ? "Hello " + username + ", Welcome to " : "";%> TinyApp<h1>
-  <h5><a style="font-weight:bold; text-decoration:underline;" href='/urls/new'>Create New TinyURL</a></h5><br />
+  <h5><a style="font-weight:bold; text-decoration:underline;" href='/urls/new'>Create New TinyURL</a></h5>
 </header>
+
+<!-- Add login and logout forms and buttons -->
 <table style="display: <%=showLogin%>; margin:0 auto 12px auto; text-align:left; width: 65%;" class="table table-hover">
 <tr><th>
 <form style="text-align:center;" method="POST" action="/login"><input type="text" placeholder=" Enter your username" name="username" value="" />
@@ -23,7 +25,7 @@ showLogout = (username !== undefined) ? "table" : "none";
 </th></tr>
 </table>
 <table style="display: <%=showLogout%>; margin:0 auto 12px auto; text-align:left; width: 65%;" class="table table-hover">
-<tr><th>
+<tr style="border-bottom: 1px solid #dee2e6;"><th>
 <form style="text-align:center;" method="POST" action="/logout">
-<button style="margin-left: 0.25em;" class="btn btn-primary" type="submit">Logout</button></form>
+<button style="margin-left: 0.25em;" class="btn btn-danger" type="submit">Logout</button></form>
 </th></tr>
