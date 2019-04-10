@@ -1,9 +1,11 @@
 <!-- views/partials/_header.ejs -->
 <meta charset="UTF-8">
 <%
-var showForm = "visible";
-showForm = (!username) ? "visible" : "hidden";
+var showForm = "table";
+showLogin = (username === undefined) ? "table" : "none";
+showLogout = (username !== undefined) ? "table" : "none";
 %>
+
 <header style="margin: 0 auto; text-align: center;">
 
 <title>TinyApp URL Shortener</title>
@@ -11,8 +13,17 @@ showForm = (!username) ? "visible" : "hidden";
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css"
         integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
-  <h1>TinyApp<h1>
-  <h6><a style="font-weight:bold; text-decoration:underline;" href='/urls/new'>Create New TinyURL</a></h5><br />
+  <h1><%=(username) ? "Hello " + username + ", Welcome to " : "";%> TinyApp<h1>
+  <h5><a style="font-weight:bold; text-decoration:underline;" href='/urls/new'>Create New TinyURL</a></h5><br />
 </header>
-<form style="visibility: <%=showForm%>;"method="POST" action="/login"><input type="text" name="username" value="" /><button style="float:right;" type="submit">Login</button></form>
-<%=(username) ? "Hello, " + username + "!" : "";%>
+<table style="display: <%=showLogin%>; margin:0 auto 12px auto; text-align:left; width: 65%;" class="table table-hover">
+<tr><th>
+<form style="text-align:center;" method="POST" action="/login"><input type="text" placeholder=" Enter your username" name="username" value="" />
+<button style="margin-left: 0.25em;" class="btn btn-primary" type="submit">Login</button></form>
+</th></tr>
+</table>
+<table style="display: <%=showLogout%>; margin:0 auto 12px auto; text-align:left; width: 65%;" class="table table-hover">
+<tr><th>
+<form style="text-align:center;" method="POST" action="/logout">
+<button style="margin-left: 0.25em;" class="btn btn-primary" type="submit">Logout</button></form>
+</th></tr>

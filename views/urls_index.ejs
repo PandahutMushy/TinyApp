@@ -12,7 +12,7 @@
 
 <!-- Add fixed header -->
 <% include partials/_header %>
-
+<% if (username) { %>
 <body style="font-size:20px; padding:50px;">
     <table style="width:65%; margin:0 auto; text-align:left;" class="table table-hover">
          <thead><tr><th>Redirect URL</th> <th>Shortened URL</th> <th style="text-align:right;">Action</th></tr></thead>
@@ -24,5 +24,5 @@
         <% } %>
     </table>
 </body>
-
+  <% } %>
 </html>

@@ -2,7 +2,7 @@ const bodyParser = require("body-parser");
 const express = require("express");
 const app = express();
 const PORT = 8080;
-var usrName;
+var usrName = undefined;
 app.use(bodyParser.urlencoded({ extended: true }));
 app.set("view engine", "ejs");
 
@@ -37,6 +37,13 @@ app.post("/login", (req, res) => {
     res.redirect("/urls");
 });
 
+// Handle POST logout requests
+app.post("/logout", (req, res) => {
+    res.clearCookie("username");
+    usrName = undefined;
+    res.redirect("/urls");
+});
+
 // Handle POST requests for adding URLs
 app.post("/urls", (req, res) => {
     let postURL = req.body.longURL;
@@ -54,7 +61,7 @@ app.post("/urls/:shortURL/delete", (req, res) => {
 });
 
 // Handle POST requests for updating URLs
-app.post("/urls/:id", (req, res) => {
+app.post("/urls/:id", (req, res) => {undefined
     if (urlDatabase[req.params.id]) {
         urlDatabase[req.params.id] = req.body.updateURL;
     }

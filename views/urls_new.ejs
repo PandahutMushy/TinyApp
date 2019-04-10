@@ -9,13 +9,12 @@
 
     <title>TinyApp</title>
   </head>
-
+<% if (username) {%>
   <body style="font-size:20px; padding:50px;">
-
 <!-- Add fixed header -->
 <% include partials/_header %>
+    <div style="margin:0 auto;" class="form-group mb-3 text-center"><h4>Type in an address below to create a new TinyURL</h4></div>
 
-    <br /><h2>New TinyURL</h2>
     <form style="width: 535px; margin:0 auto;" class="form-inline" action="/urls" method="POST">
       <div class="form-group mb-2">
         <label for="longURL">Enter a URL:</label>
@@ -24,4 +23,5 @@
       </div>
     </form>
   </body>
+  <% } %>
 </html>
