@@ -14,7 +14,7 @@
 <% include partials/_header %>
 
 <!--Do no display content if logged out -->
-<% if (usrObj["id"] !== undefined) {%>
+<% if (usrObj.id !== undefined) {%>
 <body style="font-size:20px; padding:70px 0 35px;">
 <table style="margin:0 auto 12px auto; text-align:left; width: 31%; min-width: 425px;" class="table table-hover">
     <form class="form-inline" action="/urls" method="POST">
