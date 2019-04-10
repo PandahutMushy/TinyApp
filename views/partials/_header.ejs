@@ -1,9 +1,15 @@
 <!-- views/partials/_header.ejs -->
 <!DOCTYPE html>
 <%
-var showForm = "table";
-showLogin = (username === undefined) ? "table" : "none";
-showLogout = (username !== undefined) ? "table" : "none";
+var showLogin = "table";
+var showLogout = "none";
+
+if (usrObj)
+{
+showLogin = (usrObj["id"] === undefined) ? "table" : "none";
+showLogout = (usrObj["id"] !== undefined) ? "table" : "none";
+}
+console.log("blah", usrObj);
 %>
 
 <header style="margin: 0 auto; text-align: center;">
@@ -13,8 +19,8 @@ showLogout = (username !== undefined) ? "table" : "none";
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css"
         integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
-  <h1><%=(username) ? "Hello " + username + ", Welcome to " : "";%> TinyApp<h1>
-  <h5><a style="font-weight:bold; text-decoration:underline;" href='/urls/new'>Create New TinyURL</a></h5>
+  <h1><%=(usrObj !== undefined) ? "Hello " + usrObj["id"] + ", Welcome to " : "";%> TinyApp<h1>
+  <% if (usrObj !== undefined) { %> <h5><a style="font-weight:bold; text-decoration:underline;" href='/urls/new'>Create New TinyURL</a></h5> <% } %>
 </header>
 
 <!-- Add login and logout forms and buttons -->

@@ -1,8 +1,10 @@
-const bodyParser = require("body-parser");
 const express = require("express");
+const bodyParser = require("body-parser");
+const cookieParser = require("cookie-parser");
 const app = express();
+app.use(cookieParser());
 const PORT = 8080;
-var usrName = undefined;
+
 app.use(bodyParser.urlencoded({ extended: true }));
 app.set("view engine", "ejs");
 
@@ -30,9 +32,9 @@ app.get("/", (req, res) => {
 
 //Generate a new random 6-digit string for short URLs
 function generateRandomString(length) {
-    var str = "";
-    var characters =
-        "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+    let str = "";
+    let characters =
+      "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
     for (let i = 0; i < length; i++) {
         let randomNum = Math.floor(Math.random() * characters.length);
         str += characters[randomNum];
@@ -41,47 +43,51 @@ function generateRandomString(length) {
 }
 
 // Handle POST registration requests
-app.post("/login", (req, res) => {
-    usrName = req.body.username;
-    res.cookie("username", usrName);
-    let templateVars = {
-        username: usrName,
-        urls: urlDatabase
-    };
-    res.redirect("/urls");
-});
-
-// Handle POST login requests
 app.post("/register", (req, res) => {
-    var usrIDStr = generateRandomString(8);
-    email = req.body.email;
-    password = req.body.password;
+    let usrIDStr = generateRandomString(8);
+    let eml = req.body.email;
+    let pwd = req.body.password;
+    let insertObj = {};
 
-    if (!email || !password) {
-        res.status(400).send("You must specify an email and password!");
-        return;
+    if (!eml || !pwd) {
+      res.status(400).send("You must specify an email and password!");
+      return;
     }
     if (checkUsrExists(usrIDStr)) {
         res.status(400).send("This user ID already exists in the database!");
-      return;
+        return;
     }
 
-    let insertObj = {
-        usrIDStr: {
-        id: usrIDStr,
-        email: email,
-        password: password
-      }
+    insertObj = {
+      id: usrIDStr,
+      email: eml,
+      password: pwd
     };
-    users.usrID = insertObj;
-    res.cookie("username", usrIDStr);
-    usrName = usrIDStr;
-    res.redirect("/urls");});
+
+    users[usrIDStr] = insertObj;
+    res.cookie("user_id", usrIDStr);
+
+    res.redirect("/urls")
+});
+
+// Handle POST login requests
+app.post("/login", (req, res) => {
+    usrIDStr = req.body.username;
+    let pass = req.body.password;
+    var usrObj = users[usrIDStr];
+    if (usrIDStr in users) {
+        if (!users[usrIDStr].password == pass) {
+            res.status(400).send("Wrong credentials entered!");
+            return;
+        }
+        res.cookie("user_id", usrObj);
+        res.redirect("/urls");
+    }
+});
 
 // Handle POST logout requests
 app.post("/logout", (req, res) => {
-    res.clearCookie("username");
-    usrName = undefined;
+    res.clearCookie("user_id");
     res.redirect("/urls");
 });
 
@@ -90,20 +96,18 @@ app.post("/urls", (req, res) => {
     let postURL = req.body.longURL;
     let ranStr = generateRandomString(6);
     urlDatabase[ranStr] = postURL;
-    res.redirect("urls/" + ranStr);
+    res.redirect("/urls");
 });
 
 // Handle POST requests for deleting URLs
 app.post("/urls/:shortURL/delete", (req, res) => {
     if (req.params.shortURL && urlDatabase[req.params.shortURL])
         delete urlDatabase[req.params.shortURL];
-
     res.redirect("/urls");
 });
 
 // Handle POST requests for updating URLs
 app.post("/urls/:id", (req, res) => {
-    undefined
     if (urlDatabase[req.params.id]) {
         urlDatabase[req.params.id] = req.body.updateURL;
     }
@@ -117,9 +121,10 @@ app.get("/register", (req, res) => {
 
 //Initial/Index page
 app.get("/urls", (req, res) => {
+    console.log("users", users)
     let templateVars = {
-        username: usrName,
-      urls: urlDatabase
+        usrObj: users[req.cookies.user_id],
+        urls: urlDatabase
     };
     res.render("urls_index", templateVars);
 });
@@ -127,7 +132,7 @@ app.get("/urls", (req, res) => {
 //Form to add a new TinyURL
 app.get("/urls/new", (req, res) => {
     let templateVars = {
-        username: usrName
+      usrObj: users[req.cookies.user_id]
     };
     res.render("urls_new", templateVars);
 });
@@ -135,10 +140,11 @@ app.get("/urls/new", (req, res) => {
 //Get a shortURL by id
 app.get("/urls/:shortURL", (req, res) => {
     let templateVars = {
-        username: usrName,
-      shortURL: req.params.shortURL,
-      longURL: urlDatabase[req.params.shortURL]
+        usrObj: users[req.cookies.user_id],
+        shortURL: req.params.shortURL,
+        longURL: urlDatabase[req.params.shortURL]
     };
+    console.log(templateVars)
     res.render("urls_show", templateVars);
 });
 
@@ -148,9 +154,8 @@ app.get("/u/:shortURL", (req, res) => {
     if (longURL) res.redirect(longURL);
     else {
         let templateVars = {
-          username: usrName,
-          shortURL: req.params.shortURL,
-          longURL: undefined
+            shortURL: req.params.shortURL,
+            longURL: undefined
         };
         res.render("urls_show", templateVars);
     }
