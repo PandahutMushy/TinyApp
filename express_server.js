@@ -76,8 +76,7 @@ app.post("/register", (req, res) => {
     users.usrID = insertObj;
     res.cookie("username", usrIDStr);
     usrName = usrIDStr;
-    res.redirect("/urls");
-});
+    res.redirect("/urls");});
 
 // Handle POST logout requests
 app.post("/logout", (req, res) => {
