@@ -44,10 +44,6 @@ function generateRandomString(length) {
 app.post("/login", (req, res) => {
     usrName = req.body.username;
     res.cookie("username", usrName);
-    let templateVars = {
-        username: usrName,
-        urls: urlDatabase
-    };
     res.redirect("/urls");
 });
 
