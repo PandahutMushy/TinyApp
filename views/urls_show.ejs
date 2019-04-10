@@ -23,7 +23,7 @@
          <thead><tr><th>Redirect URL</th> <th>Shortened URL</th> <th>Update Redirect URL</th><th style="text-align:right;">Action</th></tr></thead>
          <tr><td><a href='<%longURL%>' </a><%= longURL %></a></td>
          <td><a href='/u/<%= shortURL %>'> http://localhost:8080/u/<%= shortURL %></a></td>
-         <td><form method="POST" action="/urls/<%=shortURL%>"><input type="text" name="updateURL" value="sdfsdf" /></td>
+         <td><form method="POST" action="/urls/<%=shortURL%>"><input type="text" name="updateURL" value="" /></td>
          <td><button style="float:right;" type="submit">Save</button></form></td></tr>
     <% } %>
     </table>

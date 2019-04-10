@@ -2,6 +2,7 @@ const bodyParser = require("body-parser");
 const express = require("express");
 const app = express();
 const PORT = 8080;
+var usrName;
 app.use(bodyParser.urlencoded({ extended: true }));
 app.set("view engine", "ejs");
 
@@ -25,10 +26,19 @@ function generateRandomString(length) {
     }
     return str;
 }
+// Handle POST login requests
+app.post("/login", (req, res) => {
+    usrName = req.body.username;
+    res.cookie("username", usrName);
+    let templateVars = {
+      username: usrName,
+      urls: urlDatabase
+    };
+    res.redirect("/urls");
+});
 
 // Handle POST requests for adding URLs
 app.post("/urls", (req, res) => {
-    //console.log(req);
     let postURL = req.body.longURL;
     let ranStr = generateRandomString(6);
     urlDatabase[ranStr] = postURL;
@@ -53,20 +63,27 @@ app.post("/urls/:id", (req, res) => {
 
 //Initial/Index page
 app.get("/urls", (req, res) => {
-    let templateVars = { urls: urlDatabase };
+    let templateVars = {
+        username: usrName,
+      urls: urlDatabase
+    };
     res.render("urls_index", templateVars);
 });
 
 //Form to add a new TinyURL
 app.get("/urls/new", (req, res) => {
-    res.render("urls_new");
+    let templateVars = {
+        username: usrName
+    };
+    res.render("urls_new", templateVars);
 });
 
 //Get a shortURL by id
 app.get("/urls/:shortURL", (req, res) => {
     let templateVars = {
-        shortURL: req.params.shortURL,
-        longURL: urlDatabase[req.params.shortURL]
+        username: usrName,
+      shortURL: req.params.shortURL,
+      longURL: urlDatabase[req.params.shortURL]
     };
     res.render("urls_show", templateVars);
 });
@@ -77,8 +94,9 @@ app.get("/u/:shortURL", (req, res) => {
     if (longURL) res.redirect(longURL);
     else {
         let templateVars = {
-            shortURL: req.params.shortURL,
-            longURL: undefined
+          username: usrName,
+          shortURL: req.params.shortURL,
+          longURL: undefined
         };
         res.render("urls_show", templateVars);
     }

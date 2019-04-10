@@ -1,6 +1,11 @@
 <!-- views/partials/_header.ejs -->
 <meta charset="UTF-8">
+<%
+var showForm = "visible";
+showForm = (!username) ? "visible" : "hidden";
+%>
 <header style="margin: 0 auto; text-align: center;">
+
 <title>TinyApp URL Shortener</title>
 
     <!-- Bootstrap CSS -->
@@ -8,4 +13,6 @@
         integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
   <h1>TinyApp<h1>
   <h6><a style="font-weight:bold; text-decoration:underline;" href='/urls/new'>Create New TinyURL</a></h5><br />
-<header>
+</header>
+<form style="visibility: <%=showForm%>;"method="POST" action="/login"><input type="text" name="username" value="" /><button style="float:right;" type="submit">Login</button></form>
+<%=(username) ? "Hello, " + username + "!" : "";%>
