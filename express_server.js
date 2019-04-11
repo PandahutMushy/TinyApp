@@ -39,13 +39,16 @@ app.get("/", (req, res) => {
     res.send("Hello!");
 });
 
-//Return user object matching email and password provided
+//Return user key matching email and password provided
 function retrieveUserByEmailPass(email, password, userdb) {
-  for (var key in userdb) {
-    if (users[key].email == email && users[key].password == password) {
-      return users[key].id;
+    for (var key in userdb) {
+        if (
+          userdb[key].email == email &&
+          userdb[key].password == password
+        ) {
+            return userdb[key].id;
+        }
     }
-  }
 }
 
 //Generate a new random 6-digit string for short URLs
@@ -60,11 +63,23 @@ function generateRandomString(length) {
     return str;
 }
 
+//Return URL belonging to the provided user ID
+function urlsForUser(userID, urlDB) {
+  var cloneDB = {};
+
+  for (var key in urlDB) {
+    if (urlDB[key].userID == userID) {
+      cloneDB[key] = urlDB[key];
+    }
+  }
+  return cloneDB;
+}
+
 //Check if a user exists in users database
 function checkUsrExists(email, userdb) {
     for (var key in userdb) {
-        if (users[key].email == email) {
-            return true;
+        if (userdb[key].email == email) {
+          return true;
         }
     }
 }
@@ -92,9 +107,7 @@ app.post("/register", (req, res) => {
     };
 
     users[usrIDStr] = insertObj;
-    //console.log("insertObj = ", insertObj);
     res.cookie("user_id", usrIDStr);
-
     res.redirect("/urls");
 });
 
@@ -104,16 +117,22 @@ app.post("/login", (req, res) => {
     let pwd = req.body.password;
     let usrId = retrieveUserByEmailPass(eml, pwd, users);
 
-    if (!eml || !pwd || !usrId) {
-      res.status(400).send("Invalid login credentials!");
-      return;
+    if (!usrId) {
+        res.status(400).send("Invalid login credentials!");
+        return;
     }
-    if (!checkUsrExists(eml, users)) {
-      res.status(400).send("The specified user does not exist!");
-      return;
+    else if (!checkUsrExists(eml, users)) {
+        res.status(400).send("The specified user does not exist!");
+        return;
     }
-    res.cookie("user_id", usrId);
-    res.redirect("/urls");
+    else if (usrId) {
+        res.cookie("user_id", usrId);
+        res.redirect("/urls");
+    }
+    else {
+        res.status(400).send("[DEBUG] User ID not returned!");
+        return;
+    }
 });
 
 // Handle POST logout requests
@@ -158,15 +177,18 @@ app.get("/login", (req, res) => {
 
 // Show Initial/Index page
 app.get("/urls", (req, res) => {
+
+    if (!req.cookies.user_id) {
+        res.redirect("/login");
+        return;
+    }
+
+    let usrURLs = urlsForUser(req.cookies.user_id, urlDatabase);
     let templateVars = {
-        usrObj: users[req.cookies.user_id],
-        urls: urlDatabase
+      usrObj: users[req.cookies.user_id],
+      urls: usrURLs
     };
 
-    if (!templateVars.usrObj) {
-      res.redirect("urls_login");
-      return;
-    }
     res.render("urls_index", templateVars);
 });
 
@@ -176,9 +198,9 @@ app.get("/urls/new", (req, res) => {
         usrObj: users[req.cookies.user_id]
     };
 
-    if (!templateVars.usrObj) {
-        res.redirect("urls_login");
-        return;
+    if (!req.cookies.user_id) {
+      res.redirect("/login");
+      return;
     }
 
     res.render("urls_new", templateVars);
@@ -193,7 +215,7 @@ app.get("/urls/:shortURL", (req, res) => {
     };
 
     if (!templateVars.usrObj) {
-        res.redirect("urls_login");
+        res.redirect("/login");
         return;
     }
     res.render("urls_show", templateVars);
