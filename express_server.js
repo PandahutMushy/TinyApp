@@ -94,6 +94,7 @@ app.post("/register", (req, res) => {
     if (!eml || !pwd) {
         res.body.render("You must specify an email and password!")
         res.redirect("/register");
+        return;
     }
     if (checkUsrExists(eml, users)) {
       res.status(400).send("The specified user ID already exists!");
@@ -128,6 +129,7 @@ app.post("/login", (req, res) => {
     else if (usrId) {
         res.cookie("user_id", usrId);
         res.redirect("/urls");
+        return;
     }
     else {
         res.status(400).send("[DEBUG] User ID not returned!");
@@ -152,16 +154,29 @@ app.post("/urls", (req, res) => {
 
 // Handle POST requests for updating URLs
 app.post("/urls/:id", (req, res) => {
-    if (urlDatabase[req.params.id]) {
+    if (!req.cookies.user_id) {
+        res.redirect("/login");
+        return;
+    }
+
+    if (urlDatabase[req.params.id] && urlDatabase[req.params.id].userID == req.cookies.user_id) {
         urlDatabase[req.params.id].longURL = req.body.updateURL;
+    }
+    else {
+        res.redirect("/login");
+        return;
     }
     res.redirect("/urls");
 });
 
 // Handle POST requests for deleting URLs
 app.post("/urls/:shortURL/delete", (req, res) => {
-    if (req.params.shortURL && urlDatabase[req.params.shortURL])
-        delete urlDatabase[req.params.shortURL];
+    let imgOwnerID = urlDatabase[req.params.shortURL].userID;
+    let usrID = req.cookies.user_id;
+
+    if (req.params.shortURL && urlDatabase[req.params.shortURL] && imgOwnerID == usrID) {
+      delete urlDatabase[req.params.shortURL];
+    }
     res.redirect("/urls");
 });
 
