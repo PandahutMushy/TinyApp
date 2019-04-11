@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
@@ -14,7 +13,7 @@
 <% include partials/_header %>
 
   <!--Do no display content if logged out -->
-<% if (username) { %>
+<% if (usrObj !== undefined) { %>
 <body style="font-size:20px; padding:70px 0 35px;">
     <table style="width:65%; margin:0 auto; text-align:left;" class="table table-hover">
          <thead><tr><th>Redirect URL</th> <th>Shortened URL</th> <th style="text-align:right;">Action</th></tr></thead>

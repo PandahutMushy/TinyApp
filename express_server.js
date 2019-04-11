@@ -1,37 +1,57 @@
-const bodyParser = require("body-parser");
 const express = require("express");
+const bodyParser = require("body-parser");
+const cookieParser = require("cookie-parser");
 const app = express();
+app.use(cookieParser());
 const PORT = 8080;
-var usrName = undefined;
+
 app.use(bodyParser.urlencoded({ extended: true }));
 app.set("view engine", "ejs");
 
 var urlDatabase = {
     "b2xVn2": "http://www.lighthouselabs.ca",
-    "9sm5xK": "http://www.google.com"
+    "9sm5xK": "http://www.google.com",
+    "3F5j7S": "http://www.paypal.com",
+    "sfjf2D": "http://www.gmail.com",
+    "G4jI9S": "http://www.github.com",
+    "3m9d6c": "http://www.trello.com"
 };
 
 const users = {
-    "userRandomID": {
+    userRandomID: {
         id: "userRandomID",
         email: "user@example.com",
         password: "purple-monkey-dinosaur"
     },
-    "user2RandomID": {
+    user2RandomID: {
         id: "user2RandomID",
         email: "user2@example.com",
         password: "dishwasher-funk"
+    },
+    test: {
+        id: "test",
+        email: "test@test.test",
+        password: "test"
     }
-}
+};
 
 app.get("/", (req, res) => {
     res.send("Hello!");
 });
 
+//Return user object matching email and password provided
+function retrieveUserByEmailPass(email, password, userdb) {
+  for (var key in userdb) {
+    if (users[key].email == email && users[key].password == password) {
+      return users[key].id;
+    }
+  }
+}
+
 //Generate a new random 6-digit string for short URLs
 function generateRandomString(length) {
-    var str = "";
-    var characters =
+    let str = "";
+    let characters =
         "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
     for (let i = 0; i < length; i++) {
         let randomNum = Math.floor(Math.random() * characters.length);
@@ -40,45 +60,77 @@ function generateRandomString(length) {
     return str;
 }
 
+//Check if a user exists in users database
+function checkUsrExists(email, userdb) {
+    for (var key in userdb) {
+        if (users[key].email == email) {
+            return true;
+        }
+    }
+}
+
 // Handle POST registration requests
-app.post("/login", (req, res) => {
-    usrName = req.body.username;
-    res.cookie("username", usrName);
+app.post("/register", (req, res) => {
+    let usrIDStr = generateRandomString(8);
+    let eml = req.body.email;
+    let pwd = req.body.password;
+    let insertObj = {};
+
+    if (!eml || !pwd) {
+        res.body.render("You must specify an email and password!")
+        res.redirect("/register");
+    }
+    if (checkUsrExists(eml, users)) {
+      res.status(400).send("The specified user ID already exists!");
+      return;
+    }
+
+    insertObj = {
+        id: usrIDStr,
+        email: eml,
+        password: pwd
+    };
+
+    users[usrIDStr] = insertObj;
+    //console.log("insertObj = ", insertObj);
+    res.cookie("user_id", usrIDStr);
+
     res.redirect("/urls");
 });
 
 // Handle POST login requests
-app.post("/register", (req, res) => {
-    var usrIDStr = generateRandomString(8);
-    email = req.body.email;
-    password = req.body.password;
+app.post("/login", (req, res) => {
+    let eml = req.body.email;
+    let pwd = req.body.password;
+    let insertObj = {};
+    let usrId = retrieveUserByEmailPass(eml, pwd, users);
 
-    if (!email || !password) {
-        res.status(400).send("You must specify an email and password!");
-        return;
+    if (!eml || !pwd || !usrId) {
+      res.status(400).send("Invalid login credentials!");
+      return;
     }
-    if (checkUsrExists(usrIDStr)) {
-        res.status(400).send("This user ID already exists in the database!");
+    if (!checkUsrExists(eml, users)) {
+      res.status(400).send("The specified user does not exist!");
       return;
     }
 
-    let insertObj = {
-        usrIDStr: {
-        id: usrIDStr,
-        email: email,
-        password: password
-      }
+    insertObj = {
+      id: usrId,
+      email: eml,
+      password: pwd
     };
-    users.usrID = insertObj;
-    res.cookie("username", usrIDStr);
-    usrName = usrIDStr;
-    res.redirect("/urls");});
+
+    //users[usrIDStr] = insertObj;
+    //console.log("insertObj = ", insertObj);
+    res.cookie("user_id", usrId);
+
+    res.redirect("/urls");
+});
 
 // Handle POST logout requests
 app.post("/logout", (req, res) => {
-    res.clearCookie("username");
-    usrName = undefined;
-    res.redirect("/urls");
+    res.clearCookie("user_id");
+    res.redirect("/login");
 });
 
 // Handle POST requests for adding URLs
@@ -86,55 +138,60 @@ app.post("/urls", (req, res) => {
     let postURL = req.body.longURL;
     let ranStr = generateRandomString(6);
     urlDatabase[ranStr] = postURL;
-    res.redirect("urls/" + ranStr);
+    res.redirect("/urls");
 });
 
 // Handle POST requests for deleting URLs
 app.post("/urls/:shortURL/delete", (req, res) => {
     if (req.params.shortURL && urlDatabase[req.params.shortURL])
         delete urlDatabase[req.params.shortURL];
-
     res.redirect("/urls");
 });
 
 // Handle POST requests for updating URLs
 app.post("/urls/:id", (req, res) => {
-    undefined
     if (urlDatabase[req.params.id]) {
         urlDatabase[req.params.id] = req.body.updateURL;
     }
     res.redirect("/urls");
 });
 
-// Handle GET requests for user registration
+// Show user registration page
 app.get("/register", (req, res) => {
     res.render("urls_register");
 });
 
-//Initial/Index page
+// Show login page
+app.get("/login", (req, res) => {
+    res.render("urls_login");
+});
+
+// Show Initial/Index page
 app.get("/urls", (req, res) => {
+    console.log("users", users)
     let templateVars = {
-        username: usrName,
-      urls: urlDatabase
+        usrObj: users[req.cookies.user_id],
+        urls: urlDatabase
     };
     res.render("urls_index", templateVars);
 });
 
-//Form to add a new TinyURL
+// Show form to add a new TinyURL
 app.get("/urls/new", (req, res) => {
     let templateVars = {
-        username: usrName
+        usrObj: users[req.cookies.user_id]
     };
     res.render("urls_new", templateVars);
 });
 
-//Get a shortURL by id
+// Get a shortURL by id
 app.get("/urls/:shortURL", (req, res) => {
     let templateVars = {
-        username: usrName,
-      shortURL: req.params.shortURL,
-      longURL: urlDatabase[req.params.shortURL]
+        usrObj: users[req.cookies.user_id],
+        shortURL: req.params.shortURL,
+        longURL: urlDatabase[req.params.shortURL]
     };
+    console.log(templateVars)
     res.render("urls_show", templateVars);
 });
 
@@ -144,9 +201,8 @@ app.get("/u/:shortURL", (req, res) => {
     if (longURL) res.redirect(longURL);
     else {
         let templateVars = {
-          username: usrName,
-          shortURL: req.params.shortURL,
-          longURL: undefined
+            shortURL: req.params.shortURL,
+            longURL: undefined
         };
         res.render("urls_show", templateVars);
     }
@@ -159,10 +215,3 @@ app.get("/hello", (req, res) => {
 app.listen(PORT, () => {
     console.log(`Example app listening on port ${PORT}!`);
 });
-
-function checkUsrExists (usr) {
-    if (usr in users) {
-      return true;
-    }
-    return false;
-}

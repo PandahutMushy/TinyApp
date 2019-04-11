@@ -16,7 +16,7 @@
 <% include partials/_header %>
 
 <body style="font-size:20px; padding:50px;">
-<% if (!longURL) { %>
+<% if (!longURL) {%>
         <p style="color: red"><%=shortURL %> - This short URL does not exist!</p></li>
     <% } else { %>
     <table style="width:85%; margin:0 auto; text-align:left;" class="table table-hover">
@@ -28,5 +28,4 @@
     <% } %>
     </table>
 </body>
-
 </html>
