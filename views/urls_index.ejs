@@ -15,10 +15,10 @@
   <!--Do no display content if logged out -->
 <% if (usrObj !== undefined) { %>
 <body style="font-size:20px; padding:70px 0 35px;">
-    <table style="width:65%; margin:0 auto; text-align:left;" class="table table-hover">
+    <table style="width:69%; margin:0 auto; text-align:left;" class="table table-hover">
          <thead><tr><th>Redirect URL</th> <th>Shortened URL</th> <th style="text-align:right;">Action</th></tr></thead>
          <% for (var url in urls)  { %>
-            <tr><td><a href='<%= urls[url] %>'><%= urls[url] %></a></td>
+            <tr><td><a href='<%=  urls[url].longURL %>'><%= urls[url].longURL %></a></td>
             <td><a href='/u/<%= url %>'> http://localhost:8080/u/<%= url %></a></td>
             <td><div style="text-align:right;"><div style="display: inline-block;"><a href="/urls/<%=url%>"><button style="float:right; cursor:pointer;">Update</button></a></div>
             <form style="display: inline-block;" method="POST" action="/urls/<%=url%>/delete"><button style="float:right;" type="submit">Delete</button></form></div></td></tr>

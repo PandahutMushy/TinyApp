@@ -9,12 +9,12 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.set("view engine", "ejs");
 
 var urlDatabase = {
-    "b2xVn2": "http://www.lighthouselabs.ca",
-    "9sm5xK": "http://www.google.com",
-    "3F5j7S": "http://www.paypal.com",
-    "sfjf2D": "http://www.gmail.com",
-    "G4jI9S": "http://www.github.com",
-    "3m9d6c": "http://www.trello.com"
+    "b2xVn2": { longURL: "http://www.lighthouselabs.ca", userID: "userRandomID" },
+    "9sm5xK": { longURL: "http://www.google.com", userID: "user2RandomID" },
+    "3F5j7S": { longURL: "http://www.paypal.com", userID: "test" },
+    "sfjf2D": { longURL: "http://www.gmail.com", userID: "test" },
+    "G4jI9S": { longURL: "http://www.github.com", userID: "test" },
+    "3m9d6c": { longURL: "http://www.trello.com", userID: "test" }
 };
 
 const users = {
@@ -102,7 +102,6 @@ app.post("/register", (req, res) => {
 app.post("/login", (req, res) => {
     let eml = req.body.email;
     let pwd = req.body.password;
-    let insertObj = {};
     let usrId = retrieveUserByEmailPass(eml, pwd, users);
 
     if (!eml || !pwd || !usrId) {
@@ -113,17 +112,7 @@ app.post("/login", (req, res) => {
       res.status(400).send("The specified user does not exist!");
       return;
     }
-
-    insertObj = {
-      id: usrId,
-      email: eml,
-      password: pwd
-    };
-
-    //users[usrIDStr] = insertObj;
-    //console.log("insertObj = ", insertObj);
     res.cookie("user_id", usrId);
-
     res.redirect("/urls");
 });
 
@@ -135,9 +124,18 @@ app.post("/logout", (req, res) => {
 
 // Handle POST requests for adding URLs
 app.post("/urls", (req, res) => {
-    let postURL = req.body.longURL;
+    let postURL = req.body.longURL;0
     let ranStr = generateRandomString(6);
-    urlDatabase[ranStr] = postURL;
+    let usrID = req.cookies.user_id;
+    urlDatabase[ranStr] = { "longURL": postURL, "userID": usrID };
+    res.redirect("/urls");
+});
+
+// Handle POST requests for updating URLs
+app.post("/urls/:id", (req, res) => {
+    if (urlDatabase[req.params.id]) {
+        urlDatabase[req.params.id].longURL = req.body.updateURL;
+    }
     res.redirect("/urls");
 });
 
@@ -145,14 +143,6 @@ app.post("/urls", (req, res) => {
 app.post("/urls/:shortURL/delete", (req, res) => {
     if (req.params.shortURL && urlDatabase[req.params.shortURL])
         delete urlDatabase[req.params.shortURL];
-    res.redirect("/urls");
-});
-
-// Handle POST requests for updating URLs
-app.post("/urls/:id", (req, res) => {
-    if (urlDatabase[req.params.id]) {
-        urlDatabase[req.params.id] = req.body.updateURL;
-    }
     res.redirect("/urls");
 });
 
@@ -168,11 +158,15 @@ app.get("/login", (req, res) => {
 
 // Show Initial/Index page
 app.get("/urls", (req, res) => {
-    console.log("users", users)
     let templateVars = {
         usrObj: users[req.cookies.user_id],
         urls: urlDatabase
     };
+
+    if (!templateVars.usrObj) {
+      res.redirect("urls_login");
+      return;
+    }
     res.render("urls_index", templateVars);
 });
 
@@ -181,6 +175,12 @@ app.get("/urls/new", (req, res) => {
     let templateVars = {
         usrObj: users[req.cookies.user_id]
     };
+
+    if (!templateVars.usrObj) {
+        res.redirect("urls_login");
+        return;
+    }
+
     res.render("urls_new", templateVars);
 });
 
@@ -189,9 +189,13 @@ app.get("/urls/:shortURL", (req, res) => {
     let templateVars = {
         usrObj: users[req.cookies.user_id],
         shortURL: req.params.shortURL,
-        longURL: urlDatabase[req.params.shortURL]
+        longURL: urlDatabase[req.params.shortURL].longURL
     };
-    console.log(templateVars)
+
+    if (!templateVars.usrObj) {
+        res.redirect("urls_login");
+        return;
+    }
     res.render("urls_show", templateVars);
 });
 

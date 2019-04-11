@@ -9,7 +9,6 @@ if (usrObj)
 showLogin = (usrObj["id"] === undefined) ? "table" : "none";
 showLogout = (usrObj["id"] !== undefined) ? "table" : "none";
 }
-console.log("blah", usrObj);
 %>
 
 <header style="margin: 0 auto; text-align: center;">
@@ -25,8 +24,10 @@ console.log("blah", usrObj);
 </header>
 
 <!-- Add create url and logout forms and buttons -->
-<table style="display: <%=showLogout%>; margin:0 auto 12px auto; text-align:left; width: 280px;" class="table table-zebra">
+<% if (usrObj !== undefined) { %>
+<table style="display: <%=showLogout%>; margin:0 auto 12px auto; text-align:left; width: 445px;" class="table table-zebra">
 <tr style="border-bottom: 1px solid #dee2e6;">
-<% if (usrObj !== undefined) { %><td><a href="/urls/new"><button style="margin-left: 0.25em;" class="btn btn-success">Create New URL</button></a></td><% } %>
+<td><a href="/urls/new"><button style="margin-left: 0.25em;" class="btn btn-success">Create New URL</button></a></td>
+<td><a href="/urls"><button style="margin-left: 0.25em;" class="btn btn-primary">View URL List</button></a></td>
 <td><form style="text-align:center;" method="POST" action="/logout">
-<button style="margin-left: 0.25em;" class="btn btn-danger" type="submit">Logout</button></form></td></tr>
+<button style="margin-left: 0.25em;" class="btn btn-danger" type="submit">Logout</button></form></td></tr></table><% } %>
