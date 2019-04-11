@@ -14,13 +14,13 @@
 <% include partials/_header %>
 
 <!--Do no display content if logged out -->
-<% if (usrObj.id !== undefined) {%>
+<% if (usrObj) {%>
 <body style="font-size:20px; padding:70px 0 35px;">
 <table style="margin:0 auto 12px auto; text-align:left; width: 31%; min-width: 425px;" class="table table-hover">
     <form class="form-inline" action="/urls" method="POST">
       <div class="form-group mb-0 text-center">
         <label for="longURL"><h4>Type in an address below to create a new TinyURL</h4></label>
-        <tr><td><input style="width: 300px; margin: 0 auto 1em auto;" class="form-control" type="text" name="longURL" placeholder="http://" style="width: 300px; margin: 1em"></td>
+        <tr><td><input style="max-width: 90%; margin: 0 auto 1em auto; float: right;" class="form-control" type="text" name="longURL" placeholder="http://" style="width: 300px; margin: 1em"></td>
         <td><button type="submit" class="btn btn-primary">Submit</button></td></tr>
       </div>
     </form>

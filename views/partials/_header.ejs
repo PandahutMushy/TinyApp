@@ -19,19 +19,14 @@ console.log("blah", usrObj);
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css"
         integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
-  <h1><%=(usrObj !== undefined) ? "Hello " + usrObj.email + ", Welcome to " : "";%> TinyApp<h1>
-  <% if (usrObj !== undefined) { %> <h5><a style="font-weight:bold; text-decoration:underline;" href='/urls/new'>Create New TinyURL</a></h5> <% } %>
+  <h3><%=(usrObj !== undefined) ? "Hello " + usrObj.email + ", Welcome to " : "";%> TinyApp<h3>
+  <% if (usrObj === undefined) {%> <% include _login%> <% } %>
+
 </header>
 
-<!-- Add login and logout forms and buttons -->
-<table style="display: <%=showLogin%>; margin:0 auto 12px auto; text-align:left; width: 65%;" class="table table-hover">
-<tr><th>
-<form style="text-align:center;" method="POST" action="/login"><input type="text" placeholder=" Enter your username" name="username" value="" />
-<button style="margin-left: 0.25em;" class="btn btn-primary" type="submit">Login</button></form>
-</th></tr>
-</table>
-<table style="display: <%=showLogout%>; margin:0 auto 12px auto; text-align:left; width: 65%;" class="table table-hover">
-<tr style="border-bottom: 1px solid #dee2e6;"><th>
-<form style="text-align:center;" method="POST" action="/logout">
-<button style="margin-left: 0.25em;" class="btn btn-danger" type="submit">Logout</button></form>
-</th></tr>
+<!-- Add create url and logout forms and buttons -->
+<table style="display: <%=showLogout%>; margin:0 auto 12px auto; text-align:left; width: 280px;" class="table table-zebra">
+<tr style="border-bottom: 1px solid #dee2e6;">
+<% if (usrObj !== undefined) { %><td><a href="/urls/new"><button style="margin-left: 0.25em;" class="btn btn-success">Create New URL</button></a></td><% } %>
+<td><form style="text-align:center;" method="POST" action="/logout">
+<button style="margin-left: 0.25em;" class="btn btn-danger" type="submit">Logout</button></form></td></tr>
