@@ -2,10 +2,12 @@ const express = require("express");
 const bodyParser = require("body-parser");
 const cookieParser = require("cookie-parser");
 const app = express();
-app.use(cookieParser());
+const bcrypt = require("bcrypt");
+const password = "purple-monkey-dinosaur"; // found in the req.params object
 const PORT = 8080;
 
 app.use(bodyParser.urlencoded({ extended: true }));
+app.use(cookieParser());
 app.set("view engine", "ejs");
 
 var urlDatabase = {
@@ -21,18 +23,22 @@ const users = {
     userRandomID: {
         id: "userRandomID",
         email: "user@example.com",
-        password: "purple-monkey-dinosaur"
+        password: "$2b$10$3G3wJCn64NByJCWSzn7mwOvuKctl5/qUF1PTkUFRcrJMzGfQNfE/m" //purple-monkey-dinosaur
     },
     user2RandomID: {
         id: "user2RandomID",
         email: "user2@example.com",
-        password: "dishwasher-funk"
+        password: "$2b$10$D7zANBvl/huqEGbZtTFcH.Ne/D6x9IKatF3wC9IC/Noa4ttIhESXO" //dishwasher-funk
     },
     test: {
         id: "test",
         email: "test@test.test",
-        password: "test"
-    }
+        password: "$2b$10$yN1mplGuOkVkXJb9j3BH..hbi1jS17PD9JNHkq51i019LbG3SrqbS" //test
+    },
+    BSPUvqXR:
+     { id: 'BSPUvqXR',
+       email: 'test@test.test1',
+       password: '$2b$10$kAmM5l8crt5wNyjNPz/H0ub5TuMSf26ROaZrL2YLDakYNuehLuI9q' } //test1
 };
 
 app.get("/", (req, res) => {
@@ -41,11 +47,11 @@ app.get("/", (req, res) => {
 
 //Return user key matching email and password provided
 function retrieveUserByEmailPass(email, password, userdb) {
+    //console.log("users  = ", users);
+    console.log("BCRpass input = ", bcrypt.hashSync(password, 10));
     for (var key in userdb) {
-        if (
-          userdb[key].email == email &&
-          userdb[key].password == password
-        ) {
+        console.log('Checking ',userdb[key].password, ' = ', bcrypt.compareSync(password, userdb[key].password))
+        if (userdb[key].email == email && bcrypt.compareSync(password, userdb[key].password)){
             return userdb[key].id;
         }
     }
@@ -54,8 +60,7 @@ function retrieveUserByEmailPass(email, password, userdb) {
 //Generate a new random 6-digit string for short URLs
 function generateRandomString(length) {
     let str = "";
-    let characters =
-        "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+    let characters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
     for (let i = 0; i < length; i++) {
         let randomNum = Math.floor(Math.random() * characters.length);
         str += characters[randomNum];
@@ -88,7 +93,7 @@ function checkUsrExists(email, userdb) {
 app.post("/register", (req, res) => {
     let usrIDStr = generateRandomString(8);
     let eml = req.body.email;
-    let pwd = req.body.password;
+    let pwd = bcrypt.hashSync(req.body.password, 10);
     let insertObj = {};
 
     if (!eml || !pwd) {
@@ -192,7 +197,6 @@ app.get("/login", (req, res) => {
 
 // Show Initial/Index page
 app.get("/urls", (req, res) => {
-
     if (!req.cookies.user_id) {
         res.redirect("/login");
         return;
@@ -200,8 +204,8 @@ app.get("/urls", (req, res) => {
 
     let usrURLs = urlsForUser(req.cookies.user_id, urlDatabase);
     let templateVars = {
-      usrObj: users[req.cookies.user_id],
-      urls: usrURLs
+        usrObj: users[req.cookies.user_id],
+        urls: usrURLs
     };
 
     res.render("urls_index", templateVars);
@@ -238,7 +242,7 @@ app.get("/urls/:shortURL", (req, res) => {
 
 //Handle short URL requests /u/imageid
 app.get("/u/:shortURL", (req, res) => {
-    const longURL = urlDatabase[req.params.shortURL];
+    const longURL = urlDatabase[req.params.shortURL].longURL;
     if (longURL) res.redirect(longURL);
     else {
         let templateVars = {
