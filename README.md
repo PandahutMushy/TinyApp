@@ -7,7 +7,7 @@ TinyApp is a full stack web application built with Node and Express that allows 
 - Session management using ecrypted cookies
 - Users can add, update, and delete the short URLs they have created
 - Users must be logged in to add, update, or delete their short URLs
-- Minimalist, fully responsive bootstrap design, suitable as a skeleton for any project design
+- Minimalist, fully responsive bootstrap tables, suitable as a skeleton for any project design
 
 ## Final Product
 
