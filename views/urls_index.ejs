@@ -15,7 +15,7 @@
   <!--Do no display content if logged out -->
 <% if (usrObj !== undefined) { %>
 <body style="font-size:20px; padding:70px 0 35px;">
-    <table style="width:69%; margin:0 auto; text-align:left;" class="table table-hover">
+    <table style="width:81%; margin:0 auto; text-align:left; box-shadow: 0px 0px 27px 0px rgba(0,0,0,0.18);" class="table table-hover">
          <thead><tr><th>Redirect URL</th> <th>Shortened URL</th> <th style="text-align:right;">Action</th></tr></thead>
          <% for (var url in urls)  { %>
             <tr><td><a href='<%=  urls[url].longURL %>'><%= urls[url].longURL %></a></td>
