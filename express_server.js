@@ -48,7 +48,6 @@ app.get("/", (req, res) => {
 //Return user key matching email and password provided
 function retrieveUserByEmailPass(email, password, userdb) {
     for (var key in userdb) {
-        console.log('Checking ',userdb[key].password, ' = ', bcrypt.compareSync(password, userdb[key].password))
         if (userdb[key].email == email && bcrypt.compareSync(password, userdb[key].password)){
             return userdb[key].id;
         }
@@ -256,5 +255,5 @@ app.get("/hello", (req, res) => {
 });
 
 app.listen(PORT, () => {
-    console.log(`Example app listening on port ${PORT}!`);
+    console.log(`TinyApp listening on port ${PORT}!`);
 });

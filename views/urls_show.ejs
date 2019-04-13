@@ -19,7 +19,7 @@
 <% if (!longURL) {%>
         <p style="color: red"><%=shortURL %> - This short URL does not exist!</p></li>
     <% } else { %>
-    <table style="width:85%; margin:0 auto; text-align:left;" class="table table-hover">
+    <table style="width:85%; margin:0 auto; text-align:left; box-shadow: 0px 0px 27px 0px rgba(0,0,0,0.18);" class="table table-hover">
          <thead><tr><th>Redirect URL</th> <th>Shortened URL</th> <th>Update Redirect URL</th><th style="text-align:right;">Action</th></tr></thead>
          <tr><td><a href='<%longURL%>' </a><%= longURL %></a></td>
          <td><a href='/u/<%=shortURL %>'> http://localhost:8080/u/<%= shortURL %></a></td>
